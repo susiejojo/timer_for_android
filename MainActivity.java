@@ -1,6 +1,7 @@
 package com.example.stopwatch;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -28,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     CountDownTimer countdowntimer;
     Vibrator v;
     AudioManager audioManager;
+    Intent activityIntent;
     long[] pattern={0,1000,1000};
     private final String CHANNEL_ID= "personal notifications";
 
@@ -49,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFinish() {
                 Log.i("Finished!", "All done!");
+                btn.setEnabled(true);
                 mp = MediaPlayer.create(getApplicationContext(), R.raw.loud);
                 mp.start();
                 mp.setLooping(true);
@@ -58,7 +61,8 @@ public class MainActivity extends AppCompatActivity {
                 i=1;
                 btn2.setEnabled(true);
                 audioManager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
-                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,1,AudioManager.FLAG_SHOW_UI);
+                audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC),AudioManager.FLAG_SHOW_UI);
+
                 notifyme();
             }
         }.start();
@@ -81,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
         timersetter.setProgress(30);
         timersetter.setEnabled(true);
         countdowntimer.cancel();
+        btn2.setEnabled(false);
         btn.setText("GO!");
         counterisactive=false;
         mp.stop();
@@ -98,7 +103,6 @@ public class MainActivity extends AppCompatActivity {
         else{
             return super.onKeyDown(keycode,event);
         }
-
         }
         else {
             return super.onKeyDown(keycode,event);
@@ -131,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onFinish() {
                     Log.i("Finished!", "All done!");
+
                     mp = MediaPlayer.create(getApplicationContext(), R.raw.loud);
                     mp.start();
                     mp.setLooping(true);
@@ -141,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
                     btn2.setEnabled(true);
                     audioManager=(AudioManager)getSystemService(Context.AUDIO_SERVICE);
                     audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC),AudioManager.FLAG_SHOW_UI);
-                  notifyme();
+                    notifyme();
 
                 }
             }.start();
@@ -151,6 +156,9 @@ public class MainActivity extends AppCompatActivity {
         NotificationCompat.Builder notif = new NotificationCompat.Builder(this,CHANNEL_ID).setSmallIcon(R.drawable.timer).setContentTitle("Timer").setContentText("Time Up!").setPriority(NotificationCompat.PRIORITY_HIGH);
         NotificationManagerCompat notificationManagerCompat=NotificationManagerCompat.from(this);
         notificationManagerCompat.notify(001,notif.build());
+        activityIntent = new Intent(this, MainActivity.class);
+        activityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(activityIntent);
  }
     public void UpdateTimer(int timeleft)
     {
